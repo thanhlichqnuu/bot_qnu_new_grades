@@ -1,9 +1,17 @@
 import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, BackgroundTasks
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, filters
 import requests
 from bs4 import BeautifulSoup
+
+# Tải biến môi trường từ tệp .env
+load_dotenv()
+
+# Lấy BOT_TOKEN từ biến môi trường
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+bot = Bot(token=BOT_TOKEN)
 
 # Các trạng thái cho ConversationHandler
 WAITING_FOR_USERNAME, WAITING_FOR_PASSWORD = range(2)
@@ -14,25 +22,18 @@ app = FastAPI()
 # Lưu trữ thông tin người dùng
 user_credentials = {}
 
-# Token bot Telegram
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-bot = Bot(token=BOT_TOKEN)
-
 # Tạo ứng dụng Telegram Bot
 application = Application.builder().token(BOT_TOKEN).build()
-
 
 # Hàm đăng nhập
 async def login(update: Update, context) -> int:
     await update.message.reply_text("Vui lòng nhập mã sinh viên của bạn:")
     return WAITING_FOR_USERNAME
 
-
 async def get_username(update: Update, context) -> int:
     context.user_data["username"] = update.message.text
     await update.message.reply_text("Vui lòng nhập mật khẩu của bạn:")
     return WAITING_FOR_PASSWORD
-
 
 async def get_password(update: Update, context) -> int:
     username = context.user_data["username"]
@@ -51,7 +52,6 @@ async def get_password(update: Update, context) -> int:
         await update.message.reply_text("Đăng nhập thất bại. Vui lòng thử lại bằng lệnh /login.")
     return ConversationHandler.END
 
-
 # Hàm đăng xuất
 async def logout(update: Update, context) -> None:
     chat_id = update.effective_chat.id
@@ -60,7 +60,6 @@ async def logout(update: Update, context) -> None:
         await update.message.reply_text("Đăng xuất thành công! Bạn đã được xóa khỏi hệ thống.")
     else:
         await update.message.reply_text("Bạn chưa đăng nhập. Vui lòng sử dụng lệnh /login để đăng nhập.")
-
 
 # Hàm đăng nhập vào trang web của trường
 def login_to_school(username, password):
@@ -73,7 +72,6 @@ def login_to_school(username, password):
         return session
     else:
         return None  # Đăng nhập thất bại
-
 
 # Kiểm tra điểm mới và gửi thông báo
 def check_new_grades():
@@ -106,7 +104,6 @@ def check_new_grades():
         if new_grades:
             bot.send_message(chat_id=chat_id, text=f"Các môn học sau đã có điểm: {', '.join(new_grades)}")
 
-
 # Kiểm tra hiệu lực phiên đăng nhập
 def is_session_valid(session):
     home_url = "https://daotao.qnu.edu.vn/Home"
@@ -124,7 +121,6 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks):
     # Thêm logic kiểm tra điểm trong nền
     background_tasks.add_task(check_new_grades)
     return {"ok": True}
-
 
 # ConversationHandler cho login
 conv_handler = ConversationHandler(
