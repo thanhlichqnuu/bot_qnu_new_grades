@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, BackgroundTasks
 from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, filters, CallbackContext
 import requests
 from bs4 import BeautifulSoup
 
@@ -26,16 +26,18 @@ user_credentials = {}
 application = Application.builder().token(BOT_TOKEN).build()
 
 # Hàm đăng nhập
-async def login(update: Update, context) -> int:
+async def login(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Vui lòng nhập mã sinh viên của bạn:")
     return WAITING_FOR_USERNAME
 
-async def get_username(update: Update, context) -> int:
+# Hàm xử lý khi nhận được mã sinh viên
+async def get_username(update: Update, context: CallbackContext) -> int:
     context.user_data["username"] = update.message.text
     await update.message.reply_text("Vui lòng nhập mật khẩu của bạn:")
     return WAITING_FOR_PASSWORD
 
-async def get_password(update: Update, context) -> int:
+# Hàm xử lý khi nhận được mật khẩu
+async def get_password(update: Update, context: CallbackContext) -> int:
     username = context.user_data["username"]
     password = update.message.text
 
@@ -53,7 +55,7 @@ async def get_password(update: Update, context) -> int:
     return ConversationHandler.END
 
 # Hàm đăng xuất
-async def logout(update: Update, context) -> None:
+async def logout(update: Update, context: CallbackContext) -> None:
     chat_id = update.effective_chat.id
     if chat_id in user_credentials:
         del user_credentials[chat_id]
@@ -110,9 +112,8 @@ def is_session_valid(session):
     response = session.get(home_url)
     return response.status_code == 200
 
-
 # Webhook xử lý Telegram
-@app.post("/")
+@app.post("/webhook")
 async def telegram_webhook(request: Request, background_tasks: BackgroundTasks):
     data = await request.json()
     update = Update.de_json(data, bot)
@@ -135,3 +136,9 @@ conv_handler = ConversationHandler(
 # Thêm handler vào bot
 application.add_handler(conv_handler)
 application.add_handler(CommandHandler("logout", logout))
+
+# Endpoint để kích hoạt kiểm tra điểm từ bên ngoài (cron job)
+@app.post("/check-grades")
+async def check_grades_endpoint(background_tasks: BackgroundTasks):
+    background_tasks.add_task(check_new_grades)
+    return {"ok": True}

@@ -1,5 +1,6 @@
-fastapi>=0.95.0
+fastapi
+uvicorn
+python-dotenv
+requests
+beautifulsoup4
 python-telegram-bot>=20.0
-beautifulsoup4>=4.11.0
-requests>=2.28.0
-python-dotenv>=0.21.0
