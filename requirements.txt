@@ -1,4 +1,4 @@
-python-telegram-bot
-requests
-beautifulsoup4
-schedule
+fastapi>=0.95.0
+python-telegram-bot>=20.0
+beautifulsoup4>=4.11.0
+requests>=2.28.0
