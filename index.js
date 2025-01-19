@@ -11,8 +11,8 @@ const port = process.env.PORT || 3000;
 // Lấy Telegram Bot Token từ biến môi trường
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-// Khởi tạo Telegram Bot với Polling
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+// Khởi tạo Telegram Bot (không sử dụng Polling)
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
 
 // Lưu trữ thông tin người dùng
 const userCredentials = {};
@@ -23,6 +23,13 @@ app.use(express.json());
 // Endpoint chính
 app.get('/', (req, res) => {
     res.send('Hello World');
+});
+
+// Endpoint cho Webhook
+app.post('/webhook', (req, res) => {
+    const update = req.body;
+    bot.processUpdate(update); // Xử lý update từ Telegram
+    res.sendStatus(200);
 });
 
 // Hàm kiểm tra hiệu lực phiên đăng nhập
