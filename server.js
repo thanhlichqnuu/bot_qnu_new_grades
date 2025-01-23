@@ -41,7 +41,7 @@ const loginToSchool = async (username, password, chatId) => {
     await page.click('input[type="submit"]');
     await page.waitForNavigation({ waitUntil: "networkidle2" });
 
-    if (page.url() === "https://daotao.qnu.edu.vn/Home") {
+    if (page.url() == "https://daotao.qnu.edu.vn/Home") {
       sessions[chatId] = { browser };
       return true;
     } else {
