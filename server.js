@@ -29,7 +29,10 @@ app.post("/webhook", (req, res) => {
 });
 
 const loginToSchool = async (username, password, chatId) => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    executablePath: '/app/.apt/usr/bin/google-chrome',
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+});
   const page = await browser.newPage();
 
   try {
