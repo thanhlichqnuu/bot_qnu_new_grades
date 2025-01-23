@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: false });
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
 
 const sessions = {};
 const checkGradeIntervals = {};
