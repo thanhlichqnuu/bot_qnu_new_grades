@@ -20,14 +20,14 @@ const pendingLogin = {};
 bot.setWebHook(`${WEBHOOK_URL}`);
 connectDB();
 
+app.use(express.json());
 app.post(`/${TELEGRAM_BOT_TOKEN}`, (req, res) => {
-  console.log(req.body);
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
 app.get("/", (req, res) => res.send("Bot is running!"));
-app.use(express.json());
+
 
 const loginToSchool = async (username, password, chatId) => {
   const browser = await puppeteer.launch({
