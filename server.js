@@ -5,11 +5,12 @@ const puppeteer = require("puppeteer");
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const connectDB = require("./connectDB"); 
+const bodyParser = require("body-parser");
 
-const app = express();
 const port = process.env.PORT;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { webHook: true });
 
 const sessions = {};
 const checkGradeIntervals = {};
@@ -18,15 +19,16 @@ let pendingLogin = {};
 
 connectDB();
 
-app.use(express.json());
+const app = express();
+app.use(bodyParser.json());
+bot.setWebHook(`${WEBHOOK_URL}`);
 
-app.get("/", (req, res) => res.send("Hello World"));
-
-app.post("/webhook", (req, res) => {
-  const update = req.body;
-  bot.processUpdate(update);
+app.post(`/${TELEGRAM_BOT_TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
   res.sendStatus(200);
 });
+
+app.get("/", (req, res) => res.send("Bot is running!"));
 
 const loginToSchool = async (username, password, chatId) => {
   const browser = await puppeteer.launch({
