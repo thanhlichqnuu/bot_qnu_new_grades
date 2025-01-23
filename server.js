@@ -143,7 +143,6 @@ const toggleGradeCheck = async (chatId) => {
   }
 };
 
-
 const handleLogout = async (chatId) => {
   const user = await User.findOne({ chatId });
   if (!user) return bot.sendMessage(chatId, "Bạn chưa đăng nhập!");
