@@ -31,7 +31,7 @@ app.get("/", (req, res) => res.send("Bot is running!"));
 
 const loginToSchool = async (username, password, chatId) => {
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
+   args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
 
