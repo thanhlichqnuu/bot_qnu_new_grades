@@ -30,8 +30,7 @@ app.post("/webhook", (req, res) => {
 
 const loginToSchool = async (username, password, chatId) => {
   const browser = await puppeteer.launch({
-    executablePath: '/app/.apt/usr/bin/google-chrome',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox']
 });
   const page = await browser.newPage();
 
@@ -108,7 +107,6 @@ const checkNewGrades = async (chatId) => {
 const handleLogin = async (chatId, username, password) => {
   const loginResult = await loginToSchool(username, password, chatId);
   
-
   if (loginResult) {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
