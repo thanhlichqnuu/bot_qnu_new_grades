@@ -28,21 +28,21 @@ app.post(`/${TELEGRAM_BOT_TOKEN}`, (req, res) => {
 
 app.get("/", (req, res) => res.send("Bot is running!"));
 
-
 const loginToSchool = async (username, password, chatId) => {
   const browser = await puppeteer.launch({
-   args: ["--no-sandbox"]
+    headless: true,
+    args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
 
   try {
     await page.goto("https://daotao.qnu.edu.vn/Login", {
-      waitUntil: "networkidle0",
+      waitUntil: "networkidle2",
     });
     await page.type('input[name="txtTaiKhoan"]', username);
     await page.type('input[name="txtMatKhau"]', password);
     await page.click('input[type="submit"]');
-    await page.waitForNavigation({ waitUntil: "networkidle0" });
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
 
     if (page.url().includes("Home")) {
       sessions[chatId] = { browser };
@@ -62,7 +62,7 @@ const checkNewGrades = async (chatId) => {
 
   try {
     await page.goto("https://daotao.qnu.edu.vn/Home/Marks", {
-      waitUntil: "networkidle0",
+      waitUntil: "networkidle2",
     });
 
     const newGrades = await page.evaluate(() => {
@@ -179,7 +179,7 @@ const handleLogout = async (chatId) => {
       const { browser } = sessions[chatId];
       const page = await browser.newPage();
       await page.goto("https://daotao.qnu.edu.vn/Login/Logout", {
-        waitUntil: "networkidle0",
+        waitUntil: "networkidle2",
       });
       await browser.close();
       delete sessions[chatId];
